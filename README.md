@@ -1,6 +1,6 @@
-# MountGear 0.1.4
+# MountGear 0.1.5
 
-Mount-related equipment swapping with a compact native WoW window. No Equipment Manager sets, external libraries, minimap button, or mount macro changes.
+Mount-related equipment swapping with a compact native WoW window. No Equipment Manager sets, external libraries or mount macro changes.
 
 ## Install
 
@@ -104,3 +104,9 @@ Report the FIRST Lua error verbatim, `/mountgear status`, and the trigger. Clien
 Local development tests are excluded from Git through `/tests/` in `.gitignore` and are not included in clones.
 
 The ride command uses client mount-journal usability checks, including riding requirements. Run it directly or from a macro containing `/mountgear ride`; it never summons from a timer. Clients without mount-journal APIs receive an explanatory message and can keep using their existing mount macro. Mount summoning and skill filtering still require in-game validation on Forever.
+
+## Minimap button and shortcut
+
+The unicorn minimap button opens the equipment window on left-click and summons a random usable mount (or dismounts) on right-click. Drag it around the minimap; its position is saved per character. The unicorn uses the built-in `INV_Unicorn2Mount` texture, whose availability depends on the client assets.
+
+`/mg` is an alias for every `/mountgear` command, including `/mg ride`, `/mg status`, `/mg restore`, and `/mg help`.

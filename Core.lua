@@ -98,6 +98,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         -- A reload/login always restores the durable snapshot before making a new one.
         if M.db.session then M.Restore(false) end
         M.CreateUI()
+        M.CreateMinimap()
         return
     end
     if not initialized then return end
@@ -121,6 +122,7 @@ for _, event in ipairs({"ADDON_LOADED", "PLAYER_ENTERING_WORLD", "PLAYER_REGEN_E
     pcall(frame.RegisterEvent, frame, event) -- patched clients may not expose every event
 end
 SLASH_MOUNTGEAR1 = "/mountgear"
+SLASH_MOUNTGEAR2 = "/mg"
 SlashCmdList.MOUNTGEAR = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")
     if msg == "ride" then M.Ride()
