@@ -1,5 +1,20 @@
 local M, A = MountGear, MountGear.API
 local icons, menuRows = {}, {}
+local tooltip
+local function itemTooltip(owner, link, anchor)
+    if not tooltip then
+        tooltip = CreateFrame("GameTooltip", "MountGearItemTooltip", UIParent, "GameTooltipTemplate")
+        tooltip:EnableMouse(false)
+        tooltip:SetClampedToScreen(true)
+    end
+    tooltip:SetOwner(owner, "ANCHOR_NONE")
+    tooltip:ClearAllPoints()
+    tooltip:SetPoint("TOPLEFT", anchor, "TOPRIGHT", 12, 0)
+    tooltip:SetHyperlink(link)
+    tooltip:EnableMouse(false)
+    return tooltip
+end
+local function hideTooltip() if tooltip then tooltip:Hide() end end
 local function backdrop(f)
     f:SetBackdrop({ bgFile="Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border", tile=true, tileSize=32, edgeSize=24, insets={left=6,right=6,top=6,bottom=6} })
 end
@@ -33,15 +48,15 @@ function M.Draw()
             b:SetScript("OnClick", function(self)
                 if A.Combat() then M.Say("Configure mount items after combat."); return end
                 if M.db.session then M.Say("Restore previous gear before editing mount items."); return end
-                table.remove(M.db.items, self.index); M.Draw()
+                hideTooltip(); table.remove(M.db.items, self.index); M.Draw()
             end)
             b:SetScript("OnEnter", function(self)
-                GameTooltip:SetOwner(self,"ANCHOR_RIGHT"); GameTooltip:SetHyperlink(self.item.link)
-                GameTooltip:AddLine("Slot " .. self.slot .. " - Right-click to remove", 0.5,1,0.5)
-                if not A.Find(self.item) then GameTooltip:AddLine("Missing from bags/equipment",1,0.3,0.3) end
-                GameTooltip:Show()
+                local tip = itemTooltip(self, self.item.link, M.window)
+                tip:AddLine("Slot " .. self.slot .. " - Right-click to remove", 0.5,1,0.5)
+                if not A.Find(self.item) then tip:AddLine("Missing from bags/equipment",1,0.3,0.3) end
+                tip:Show()
             end)
-            b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+            b:SetScript("OnLeave", hideTooltip)
             icons[i] = b
         end
         local _,_,_,_,_,_,_,_,_, texture = A.info(c.item.link)
@@ -64,14 +79,19 @@ function M.ShowMenu()
         if not row then
             row = CreateFrame("Button",nil,M.menuContent)
             row:SetSize(300,24); row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
-            row.label=row:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall"); row.label:SetPoint("LEFT",5,0)
-            row.label:SetWidth(290); row.label:SetJustifyH("LEFT")
-            row:SetScript("OnClick",function(self) if self.item then M.Add(self.item) end; menu:Hide() end)
-            row:SetScript("OnEnter",function(self) if self.item then GameTooltip:SetOwner(self,"ANCHOR_RIGHT"); GameTooltip:SetHyperlink(self.item.link); GameTooltip:Show() end end)
-            row:SetScript("OnLeave",function() GameTooltip:Hide() end)
+            row.label=row:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall"); row.label:SetPoint("LEFT",29,0)
+            row.icon=row:CreateTexture(nil,"ARTWORK"); row.icon:SetSize(20,20); row.icon:SetPoint("LEFT",5,0)
+            row.label:SetWidth(266); row.label:SetJustifyH("LEFT")
+            row:SetScript("OnClick",function(self) hideTooltip(); if self.item then M.Add(self.item) end; menu:Hide() end)
+            row:SetScript("OnEnter",function(self) if self.item then local tip=itemTooltip(self,self.item.link,menu); tip:Show() end end)
+            row:SetScript("OnLeave",hideTooltip)
             menuRows[i]=row
         end
         row.item=candidates[i]; row.label:SetText(row.item and row.item.link or "No recognized mount equipment in bags")
+        local texture
+        if row.item then texture = select(10, A.info(row.item.link)) end
+        row.icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
+        if row.item then row.icon:Show() else row.icon:Hide() end
         row:SetPoint("TOPLEFT",0,-(i-1)*24); row:Show()
     end
     menu:SetHeight(math.min(8,total)*24+24); menu:Show()
@@ -101,7 +121,8 @@ function M.CreateUI()
     local scroll=CreateFrame("ScrollFrame","MountGearMenuScroll",menu,"UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT",10,-12); scroll:SetPoint("BOTTOMRIGHT",-30,12)
     M.menuContent=CreateFrame("Frame",nil,scroll); scroll:SetScrollChild(M.menuContent)
-    menu:Hide(); f:SetScript("OnHide",function() menu:Hide() end)
+    menu:SetScript("OnHide",hideTooltip)
+    menu:Hide(); f:SetScript("OnHide",function() hideTooltip(); menu:Hide() end)
     UISpecialFrames[#UISpecialFrames+1]="MountGearWindow"
     M.Draw(); f:Hide()
 end

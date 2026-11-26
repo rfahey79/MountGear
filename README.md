@@ -1,4 +1,4 @@
-# MountGear 0.1.0
+# MountGear 0.1.1
 
 Mount-related equipment swapping with a compact native WoW window. No Equipment Manager sets, external libraries, minimap button, or mount macro changes.
 
