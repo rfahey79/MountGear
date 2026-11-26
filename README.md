@@ -99,4 +99,4 @@ Report the FIRST Lua error verbatim, `/mountgear status`, and the trigger. Clien
 
 ## Development tests
 
-The ZIP includes `tests/test_mountgear.py`, a deterministic Lua 5.1 mock suite for equip/restore, empty slots, full bags, combat, remounts, reload recovery, missing originals, swap failures, slot conflicts, and cursor safety. Run with Python and `lupa` installed: `python tests/test_mountgear.py` from the extracted package root. These tests cannot validate WoW secure-action restrictions or native UI rendering.
+Local development tests are excluded from Git through `/tests/` in `.gitignore` and are not included in clones.
