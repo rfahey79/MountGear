@@ -8,7 +8,18 @@ function M.CreateMinimap()
     b:RegisterForClicks("LeftButtonUp","RightButtonUp"); b:RegisterForDrag("LeftButton")
     local icon = b:CreateTexture(nil,"ARTWORK")
     icon:SetSize(20,20); icon:SetPoint("CENTER",0,1)
-    icon:SetTexture("Interface\\Icons\\INV_Unicorn2Mount")
+    -- Resolve the unicorn icon from client data instead of an optional texture path.
+    local texture
+    if C_Spell and C_Spell.GetSpellInfo then
+        local info = C_Spell.GetSpellInfo(247402) -- Lucid Nightmare
+        texture = info and info.iconID
+    elseif GetSpellInfo then
+        texture = select(3, GetSpellInfo(247402))
+    end
+    if not texture and C_Item and C_Item.GetItemIconByID then
+        texture = C_Item.GetItemIconByID(151623) -- Lucid Nightmare reins
+    end
+    icon:SetTexture(texture or "Interface\\Icons\\Ability_Mount_RidingHorse")
     local border = b:CreateTexture(nil,"OVERLAY")
     border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
     border:SetSize(54,54); border:SetPoint("TOPLEFT")
