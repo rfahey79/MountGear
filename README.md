@@ -4,7 +4,15 @@ Mount-related equipment swapping with a compact native WoW window. No Equipment 
 
 ## Install
 
-Exit WoW. Extract the ZIP and copy its **MountGear** folder into the **Interface/AddOns** folder belonging to the executable you actually launch:
+Exit WoW. Clone this repository directly into your client's AddOns directory:
+
+```powershell
+git clone https://github.com/rfahey79/MountGear.git MountGear
+```
+
+For an existing clone, use `git pull` inside it. The repository root contains `MountGear.toc`; there is no inner addon folder. If downloading a ZIP instead, rename the extracted `MountGear-main` folder to `MountGear` and place it in AddOns.
+
+Choose the **Interface/AddOns** folder belonging to the executable you actually launch:
 
 - Private/legacy client: `<your WoW folder>/Interface/AddOns/MountGear/`
 - A client with a `_forever_` product folder: `<World of Warcraft>/_forever_/Interface/AddOns/MountGear/`

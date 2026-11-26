@@ -36,7 +36,7 @@ def setup():
     lua = LuaRuntime(unpack_returned_tuples=True)
     lua.execute(MOCK)
     for name in ('Compat.lua', 'Items.lua', 'Core.lua'):
-        lua.execute((ROOT/'MountGear'/name).read_text())
+        lua.execute((ROOT/name).read_text())
     lua.execute('''
     MountGear.CreateUI=function() MountGear.window={Show=function() end} end
     MountGear.frame.scripts.OnEvent(nil,'ADDON_LOADED','MountGear')
@@ -55,7 +55,7 @@ def check(name, source):
 
 # Compile every shipped Lua file using the actual 5.1 parser (UI is game-tested separately).
 lua = LuaRuntime()
-for p in (ROOT/'MountGear').glob('*.lua'):
+for p in ROOT.glob('*.lua'):
     lua.execute('assert(loadstring(...))', p.read_text())
 print('PASS Lua 5.1 syntax: all files')
 check('equip and exact restore, unrelated slot untouched', '''
