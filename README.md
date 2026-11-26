@@ -1,4 +1,4 @@
-# MountGear 0.1.3
+# MountGear 0.1.4
 
 Mount-related equipment swapping with a compact native WoW window. No Equipment Manager sets, external libraries, minimap button, or mount macro changes.
 
@@ -34,6 +34,8 @@ Commands:
 | Command | Action |
 | --- | --- |
 | `/mountgear` | Toggle the compact window outside combat |
+| `/mountgear ride` | Random learned mount usable with current riding skill/location; dismount when mounted |
+| `/mountgear help` | List commands |
 | `/mountgear status` | Print build/interface, API family, identity method, configuration, pending phase and next slot |
 | `/mountgear restore` | Queue restoration now; suppress mount gear until the next dismount |
 
@@ -100,3 +102,5 @@ Report the FIRST Lua error verbatim, `/mountgear status`, and the trigger. Clien
 ## Development tests
 
 Local development tests are excluded from Git through `/tests/` in `.gitignore` and are not included in clones.
+
+The ride command uses client mount-journal usability checks, including riding requirements. Run it directly or from a macro containing `/mountgear ride`; it never summons from a timer. Clients without mount-journal APIs receive an explanatory message and can keep using their existing mount macro. Mount summoning and skill filtering still require in-game validation on Forever.

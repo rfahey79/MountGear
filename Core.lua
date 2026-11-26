@@ -123,8 +123,11 @@ end
 SLASH_MOUNTGEAR1 = "/mountgear"
 SlashCmdList.MOUNTGEAR = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")
-    if msg == "status" then M.Status()
+    if msg == "ride" then M.Ride()
+    elseif msg == "help" then M.Help()
+    elseif msg == "status" then M.Status()
     elseif msg == "restore" then M.Restore(true); M.Tick()
+    elseif msg ~= "" then M.Help()
     else
         if A.Combat() then M.Say("Open the configuration window after combat."); return end
         if M.window:IsShown() then M.window:Hide() else M.Draw(); M.window:Show() end
