@@ -6,10 +6,14 @@ local slots = { INVTYPE_HEAD={1}, INVTYPE_NECK={2}, INVTYPE_SHOULDER={3}, INVTYP
     INVTYPE_CHEST={5}, INVTYPE_ROBE={5}, INVTYPE_WAIST={6}, INVTYPE_LEGS={7}, INVTYPE_FEET={8},
     INVTYPE_WRIST={9}, INVTYPE_HAND={10}, INVTYPE_FINGER={11,12}, INVTYPE_TRINKET={13,14},
     INVTYPE_CLOAK={15}, INVTYPE_TABARD={19} }
+-- Classic enchant IDs; slot checks prevent recognizing unrelated custom enchants.
+M.KnownEnchants = { [464] = 8, [930] = 10 } -- Mithril Spurs; Enchant Gloves - Riding Skill
 local scan
 local function mountLine(text)
     text = text:lower()
     if text:find("use:", 1, true) or text:find("chance", 1, true) then return false end
+    if text:find("mithril spurs", 1, true) or text:find("riding skill", 1, true) or
+       text:find("riding speed", 1, true) then return true end
     -- Explicit mount/riding-speed wording, never generic movement speed.
     return text:find("mount") and text:find("speed") and
         (text:find("increase") or text:find("riding speed") or text:find("mounted movement speed") or
@@ -20,13 +24,16 @@ function M.ItemSlots(r)
     return slots[loc]
 end
 function M.Recognized(r, bag, slot)
-    if not M.ItemSlots(r) then return false end
+    local itemSlots = M.ItemSlots(r)
+    if not itemSlots then return false end
+    local enchant = tonumber(r.link:match("item:%d+:(%d+)"))
+    if enchant and M.KnownEnchants[enchant] == itemSlots[1] then return true end
     if M.KnownItems[r.id] then return true end
     if C_TooltipInfo and C_TooltipInfo.GetBagItem then
         local data = C_TooltipInfo.GetBagItem(bag, slot)
         if data and data.lines then
             for _, line in ipairs(data.lines) do
-                if line.leftText and mountLine(line.leftText) then return true end
+                if (line.leftText and mountLine(line.leftText)) or (line.rightText and mountLine(line.rightText)) then return true end
             end
         end
     else
