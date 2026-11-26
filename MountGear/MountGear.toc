@@ -2,7 +2,7 @@
 ## Title: MountGear
 ## Notes: Mount equipment with persistent, verified restoration.
 ## Author: Ryan Fahey
-## Version: 0.1.1
+## Version: 0.1.2
 ## SavedVariablesPerCharacter: MountGearDB
 Compat.lua
 Items.lua

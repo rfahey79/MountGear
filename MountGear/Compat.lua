@@ -1,4 +1,4 @@
-MountGear = { version = "0.1.1" }
+MountGear = { version = "0.1.2" }
 local M = MountGear
 local A = {}
 M.API = A

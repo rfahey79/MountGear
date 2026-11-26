@@ -43,7 +43,16 @@ function M.Draw()
     for i, c in ipairs(M.db.items) do
         local b = icons[i]
         if not b then
-            b = CreateFrame("Button", "MountGearItem" .. i, f, "ItemButtonTemplate")
+            b = CreateFrame("Button", "MountGearItem" .. i, f)
+            b.icon = b:CreateTexture(nil, "ARTWORK")
+            b.icon:SetAllPoints(b)
+            b:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
+            local border = b:GetNormalTexture()
+            border:ClearAllPoints()
+            border:SetPoint("TOPLEFT", b, "TOPLEFT", -6, 6)
+            border:SetPoint("BOTTOMRIGHT", b, "BOTTOMRIGHT", 6, -6)
+            b:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+            b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
             b:SetSize(32,32); b:RegisterForClicks("RightButtonUp")
             b:SetScript("OnClick", function(self)
                 if A.Combat() then M.Say("Configure mount items after combat."); return end
@@ -60,7 +69,7 @@ function M.Draw()
             icons[i] = b
         end
         local _,_,_,_,_,_,_,_,_, texture = A.info(c.item.link)
-        SetItemButtonTexture(b, texture or "Interface\\Icons\\INV_Misc_QuestionMark")
+        b.icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
         b.index=i; b.item=c.item; b.slot=c.slot
         b:ClearAllPoints(); b:SetPoint("TOPLEFT",14+((i-1)%6)*40,-34-math.floor((i-1)/6)*40); b:Show()
     end
