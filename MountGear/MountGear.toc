@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: MountGear
+## Notes: Mount equipment with persistent, verified restoration.
+## Author: Ryan Fahey
+## Version: 0.1.0
+## SavedVariablesPerCharacter: MountGearDB
+Compat.lua
+Items.lua
+Core.lua
+UI.lua
