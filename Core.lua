@@ -3,6 +3,7 @@ local frame = CreateFrame("Frame")
 M.frame = frame
 local initialized, lastMounted, suppress, pending, attempts, elapsed, poll = false, nil, false, nil, 0, 0, 0
 local blocked, reason, announced = false, "Ready", nil
+local lastAttempt = 0
 local lastFailure = "Equipment change was not confirmed"
 function M.Say(msg) DEFAULT_CHAT_FRAME:AddMessage("|cff66dd66MountGear:|r " .. tostring(msg)) end
 function M.Reason(msg)
@@ -75,8 +76,16 @@ function M.Tick()
     if A.Combat() then reason = "Waiting for combat to end"; return end
     if UnitIsDeadOrGhost and UnitIsDeadOrGhost("player") then reason = "Waiting until alive"; return end
     if UnitOnTaxi and UnitOnTaxi("player") then reason = "Waiting until taxi ends"; return end
+    if (UnitCastingInfo and UnitCastingInfo("player")) or
+       (UnitChannelInfo and UnitChannelInfo("player")) then
+        reason = "Waiting for casting/channeling to finish"; return
+    end
     if blocked then M.Reason("Automatic equipment actions blocked. Open /mountgear for the next action."); return end
-    if attempts >= 3 then M.Reason("Equipment change pending: " .. lastFailure .. ". Use /mg restore to retry, or /mg status for details."); return end
+    if attempts >= 3 then
+        M.Reason("Equipment change pending: " .. lastFailure .. ". Retrying automatically; /mg status for details.")
+        if GetTime() - lastAttempt < 5 then return end
+    end
+    lastAttempt = GetTime()
     attempts = attempts + 1
     local ok, success, err = pcall(A.Apply, slot, target)
     if not ok then reason = tostring(success)
@@ -111,6 +120,9 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_ACTION_BLOCKED" or event == "ADDON_ACTION_FORBIDDEN" then
         if arg1 == "MountGear" then blocked = true; M.Reason("Client blocked an equipment action; snapshot retained."); if not A.Combat() then M.window:Show() end end
     elseif event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_ENTERING_WORLD" then M.Wake()
+    elseif event == "UNIT_SPELLCAST_STOP" or event == "UNIT_SPELLCAST_CHANNEL_STOP" or event == "UNIT_SPELLCAST_INTERRUPTED" then
+        if arg1 ~= "player" then return end
+        M.Wake()
     elseif event == "BAG_UPDATE_DELAYED" then if not pending then M.Wake() end
     elseif event == "UNIT_AURA" and arg1 ~= "player" then return end
     if M.DrawAction and not A.Combat() then M.DrawAction() end
@@ -124,6 +136,7 @@ frame:SetScript("OnUpdate", function(_, dt)
     end
 end)
 for _, event in ipairs({"ADDON_LOADED", "PLAYER_ENTERING_WORLD", "PLAYER_REGEN_ENABLED", "PLAYER_EQUIPMENT_CHANGED",
+    "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_CHANNEL_STOP", "UNIT_SPELLCAST_INTERRUPTED",
     "BAG_UPDATE_DELAYED", "UNIT_AURA", "PLAYER_MOUNT_DISPLAY_CHANGED", "ADDON_ACTION_BLOCKED", "ADDON_ACTION_FORBIDDEN"}) do
     pcall(frame.RegisterEvent, frame, event) -- patched clients may not expose every event
 end
