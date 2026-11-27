@@ -1,4 +1,4 @@
-# MountGear 0.1.6
+# MountGear 0.1.7
 
 Mount-related equipment swapping with a compact native WoW window. No Equipment Manager sets, external libraries or mount macro changes.
 
@@ -45,7 +45,7 @@ After a failed operation, fix the cause and use `/mountgear restore` to retry re
 
 **This is a first release for in-game validation, not a claim of verified compatibility with your private client's executable.** Publicly available Forever exports currently describe a modern 1.60.1/interface 16001 client; that does not establish the build or restrictions of the private client in your request.
 
-The automatic path uses ordinary item pickup/equipment APIs outside combat. It does not use protected combat actions or attempt to bypass client restrictions. Every change is checked against the actual equipped item after 0.6 seconds; an API returning without an error is not treated as success. A blocked/forbidden action event for MountGear disables automatic attempts for the remainder of that login/reload and preserves the snapshot.
+The automatic path uses ordinary item pickup/equipment APIs outside combat. It does not use protected combat actions or attempt to bypass client restrictions. Every change is checked against the actual equipped item after 1 second; an API returning without an error is not treated as success. A blocked/forbidden action event for MountGear disables automatic attempts for the remainder of that login/reload and preserves the snapshot.
 
 When automatic actions are blocked, open the window outside combat. The **Equip slot N** button offers one secure `/equipslot` action per click. Click again for another pending slot, allowing time for confirmation between clicks. If the patched client also rejects secure macro attributes, or if the target says **Empty slot N manually**, move that item yourself using the character window. `/mountgear status` names the next desired item/empty slot. The queue observes manual placement and completes only after verification. No automatic fallback can honestly promise to overcome restrictions imposed by a particular client.
 

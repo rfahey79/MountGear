@@ -3,6 +3,7 @@ local frame = CreateFrame("Frame")
 M.frame = frame
 local initialized, lastMounted, suppress, pending, attempts, elapsed, poll = false, nil, false, nil, 0, 0, 0
 local blocked, reason, announced = false, "Ready", nil
+local lastFailure = "Equipment change was not confirmed"
 function M.Say(msg) DEFAULT_CHAT_FRAME:AddMessage("|cff66dd66MountGear:|r " .. tostring(msg)) end
 function M.Reason(msg)
     reason = msg
@@ -56,7 +57,11 @@ function M.Tick()
     if not s then return end
     if pending then
         if GetTime() < pending.untilTime then return end
-        if A.Same(A.Record(nil, pending.slot), pending.item) then attempts = 0 end
+        if A.Same(A.Record(nil, pending.slot), pending.item) then
+            attempts = 0
+        elseif pending.submitted then
+            lastFailure = "Slot " .. pending.slot .. " did not change (item locked or client rejected the swap)"
+        end
         pending = nil
     end
     local slot, target = M.Next()
@@ -71,13 +76,14 @@ function M.Tick()
     if UnitIsDeadOrGhost and UnitIsDeadOrGhost("player") then reason = "Waiting until alive"; return end
     if UnitOnTaxi and UnitOnTaxi("player") then reason = "Waiting until taxi ends"; return end
     if blocked then M.Reason("Automatic equipment actions blocked. Open /mountgear for the next action."); return end
-    if attempts >= 3 then M.Reason("Equipment change pending: " .. reason .. " Use /mountgear restore or move the item manually."); return end
+    if attempts >= 3 then M.Reason("Equipment change pending: " .. lastFailure .. ". Use /mg restore to retry, or /mg status for details."); return end
     attempts = attempts + 1
     local ok, success, err = pcall(A.Apply, slot, target)
     if not ok then reason = tostring(success)
     elseif not success then reason = err or "Client refused equipment change"
     else reason = "Waiting for equipment confirmation" end
-    pending = { slot = slot, item = target, untilTime = GetTime() + 0.6 }
+    if not ok or not success then lastFailure = reason end
+    pending = { slot = slot, item = target, submitted = ok and success, untilTime = GetTime() + 1.0 }
     if M.DrawAction then M.DrawAction() end
 end
 function M.Status()
