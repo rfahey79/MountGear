@@ -19,7 +19,7 @@ function M.Next()
     end
 end
 function M.Start()
-    if M.db.session or suppress or A.Combat() or (UnitOnTaxi and UnitOnTaxi("player")) then return end
+    if M.db.disabled or M.db.session or suppress or A.Combat() or (UnitOnTaxi and UnitOnTaxi("player")) then return end
     local s = { before = {}, targets = {}, order = {}, phase = "equip" }
     for _, c in ipairs(M.db.items) do
         local src = A.Find(c.item)
@@ -43,6 +43,16 @@ function M.Restore(manual)
     if M.db.session then M.db.session.phase = "restore" end
     attempts = 0; announced = nil
 end
+function M.SetDisabled(value)
+    M.db.disabled = value and true or false
+    if M.db.disabled then
+        M.Restore(false)
+    else
+        suppress = false
+    end
+    if M.disableCheck then M.disableCheck:SetChecked(M.db.disabled) end
+    M.Say(M.db.disabled and "Gear swapping disabled; previous gear will be restored when safe." or "Gear swapping enabled.")
+end
 function M.Wake() attempts = 0 end
 function M.Tick()
     if not initialized then return end
@@ -56,6 +66,7 @@ function M.Tick()
     if not M.db.session and mounted and not suppress then M.Start() end
     local s = M.db.session
     if not s then return end
+    if M.db.disabled then s.phase = "restore" end
     if pending then
         if GetTime() < pending.untilTime then return end
         if A.Same(A.Record(nil, pending.slot), pending.item) then
@@ -99,6 +110,7 @@ function M.Status()
     local version, build, _, interface = GetBuildInfo()
     M.Say("v" .. M.version .. "; client " .. tostring(version) .. " build " .. tostring(build) .. "; interface " .. tostring(interface))
     M.Say("Bags: " .. (C_Container and "C_Container" or "legacy") .. "; identity: " .. (C_Item and C_Item.GetItemGUID and "GUID" or "item link (identical copies indistinguishable)") .. "; mounted: " .. tostring(A.mounted and A.mounted()))
+    M.Say("Gear swapping: " .. (M.db.disabled and "disabled" or "enabled"))
     M.Say("Session: " .. (M.db.session and M.db.session.phase or "none") .. "; automatic actions: " .. (blocked and "blocked" or "not known blocked") .. "; " .. reason)
     local slot, target = M.Next()
     if slot then M.Say("Next slot " .. slot .. ": " .. (target and target.link or "empty")) end

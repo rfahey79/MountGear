@@ -38,7 +38,7 @@ function M.Draw()
     local f = M.window
     local n = #M.db.items + 1
     local cols = math.min(n, 6)
-    f:SetSize(math.max(190, 28 + cols*40), 88 + math.ceil(n/6)*40)
+    f:SetSize(math.max(210, 28 + cols*40), 116 + math.ceil(n/6)*40)
     for _, b in ipairs(icons) do b:Hide() end
     for i, c in ipairs(M.db.items) do
         local b = icons[i]
@@ -121,6 +121,16 @@ function M.CreateUI()
     local plus=CreateFrame("Button",nil,f,"UIPanelButtonTemplate"); M.plus=plus; plus:SetSize(32,32); plus:SetText("+")
     plus:GetFontString():SetTextColor(0.1,1,0.1); plus:GetFontString():SetFontObject("GameFontNormalLarge")
     plus:SetScript("OnClick", M.ShowMenu)
+    local check=CreateFrame("CheckButton","MountGearDisableCheck",f)
+    M.disableCheck=check; check:SetSize(24,24); check:SetPoint("BOTTOMLEFT",12,37)
+    check:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up")
+    check:SetPushedTexture("Interface\\Buttons\\UI-CheckBox-Down")
+    check:SetHighlightTexture("Interface\\Buttons\\UI-CheckBox-Highlight","ADD")
+    check:SetCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check")
+    check:SetChecked(M.db.disabled and true or false)
+    local label=check:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
+    label:SetPoint("LEFT",check,"RIGHT",2,0); label:SetText("Disable gear swapping")
+    check:SetScript("OnClick",function(self) M.SetDisabled(self:GetChecked()) end)
     local action=CreateFrame("Button","MountGearActionButton",f,"SecureActionButtonTemplate,UIPanelButtonTemplate")
     M.action=action; action:SetSize(166,22); action:SetPoint("BOTTOM",0,12)
     action:RegisterForClicks("AnyUp","AnyDown")

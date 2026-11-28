@@ -1,4 +1,4 @@
-# MountGear 0.1.8
+# MountGear 0.1.9
 
 Mount-related equipment swapping with a compact native WoW window. No Equipment Manager sets, external libraries or mount macro changes.
 
@@ -110,3 +110,7 @@ The ride command uses client mount-journal usability checks, including riding re
 The unicorn minimap button opens the equipment window on left-click and summons a random usable mount (or dismounts) on right-click. Drag it around the minimap; its position is saved per character. The button resolves the Lucid Nightmare unicorn icon from client spell/item data, with a standard horse icon fallback if that data is unavailable.
 
 `/mg` is an alias for every `/mountgear` command, including `/mg ride`, `/mg status`, `/mg restore`, and `/mg help`.
+
+## Disable gear swapping
+
+Check **Disable gear swapping** in the equipment window, or Ctrl-click the minimap button to toggle it. This per-character setting persists across reloads. Disabling restores an existing original equipment snapshot when safe, then prevents new mount-gear swaps. Combat and casting restrictions still apply to restoration. Mount summoning remains available. Uncheck it or Ctrl-click again to resume swapping.
